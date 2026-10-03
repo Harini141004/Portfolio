@@ -745,11 +745,23 @@
   .r-cert-chip span { color: var(--accent2); margin-right: 0.3rem; }
 
   @media print {
-    nav, .resume-sidebar, .hero, .full-divider, footer,
-    section:not(#resume) { display: none !important; }
-    #resume { padding: 0 !important; }
-    .resume-wrapper { gap: 0; }
-    .resume-doc { border: none; padding: 1rem 0; background: white; color: #111; }
+    @page { size: A4; margin: 12mm; }
+    html, body { background: #fff !important; color: #111 !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    nav, .resume-sidebar, .hero, .full-divider, footer, .cursor,
+    section:not(#resume), #resume > .section-label, #resume > .section-title { display: none !important; }
+    #resume { display: block !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
+    .resume-wrapper { display: block !important; gap: 0; }
+    /* undo the scroll-in animation so the doc is visible when printing */
+    .fade-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .resume-doc { border: none !important; padding: 0 !important; background: #fff !important;
+      color: #111 !important; width: 100% !important; max-width: none !important; box-shadow: none !important; }
+    .resume-doc::before { display: none !important; }
+    /* switch the dark-theme light text colours to dark ones */
+    .resume-doc * { color: #222 !important; background: transparent !important; border-color: #ccc !important; }
+    .resume-doc .r-entry-desc, .resume-doc .r-skill-val { color: #444 !important; }
+    .resume-doc .r-entry-sub, .resume-doc .r-entry-date { color: #666 !important; }
+    .resume-doc .r-entry { break-inside: avoid; }
   }
 
   /* Full-width divider */
@@ -1287,6 +1299,11 @@
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
   document.querySelectorAll('.fade-up:not(.visible)').forEach(el => observer.observe(el));
+
+  // Make sure the resume is fully visible when printing / saving as PDF
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+  });
 </script>
 </body>
 </html>
